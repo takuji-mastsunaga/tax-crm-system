@@ -1,12 +1,15 @@
 {
-  "name": "webapp",
-  "version": "0.1.0",
+  "name": "tax-crm-system",
+  "version": "1.0.0",
+  "description": "Tax CRM System with Firebase and BigQuery integration",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "export": "next export",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "firebase": "^11.9.0",
@@ -25,5 +28,22 @@
     "eslint-config-next": "15.3.3",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": [
+    "tax",
+    "crm",
+    "firebase",
+    "bigquery",
+    "nextjs",
+    "typescript"
+  ],
+  "author": "Tax CRM Team",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/tax-crm-system.git"
   }
 }
