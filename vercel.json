@@ -11,7 +11,7 @@
     }
   },
   "env": {
-    "NEXTAUTH_URL": "https://tax-crm-system-prod.vercel.app",
+    "NEXTAUTH_URL": "https://tax-crm-system-v3.vercel.app",
     "NEXT_PUBLIC_FIREBASE_PROJECT_ID": "tax-crm-project"
   },
   "headers": [
