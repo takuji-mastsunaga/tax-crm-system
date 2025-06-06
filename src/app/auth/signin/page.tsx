@@ -27,7 +27,7 @@ export default function SignIn() {
             Tax CRM システム
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            @your-company.com のアカウントでログインしてください
+            許可されたアカウントでログインしてください
           </p>
         </div>
         
@@ -59,7 +59,7 @@ export default function SignIn() {
           
           <div className="text-center">
             <p className="text-xs text-gray-500">
-              このシステムは @your-company.com ドメインのアカウントのみアクセス可能です
+              このシステムは許可された特定のアカウントのみアクセス可能です
             </p>
           </div>
         </div>
