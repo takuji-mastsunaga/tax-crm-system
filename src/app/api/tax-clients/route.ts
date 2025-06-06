@@ -42,10 +42,10 @@ export async function GET(request: NextRequest) {
 
     // 検索フィルタ
     if (search) {
-      clients = clients.filter((client: any) => 
-        client.companyName?.toLowerCase().includes(search.toLowerCase()) ||
-        client.representativeName?.toLowerCase().includes(search.toLowerCase()) ||
-        client.email?.toLowerCase().includes(search.toLowerCase())
+      clients = clients.filter((client: Record<string, unknown>) => 
+        (typeof client.companyName === "string" && client.companyName.toLowerCase().includes(search.toLowerCase())) ||
+        (typeof client.representativeName === "string" && client.representativeName.toLowerCase().includes(search.toLowerCase())) ||
+        (typeof client.email === "string" && client.email.toLowerCase().includes(search.toLowerCase()))
       )
     }
 

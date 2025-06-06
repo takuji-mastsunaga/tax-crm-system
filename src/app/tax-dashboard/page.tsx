@@ -11,31 +11,12 @@ export default function TaxDashboardPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [showAddForm, setShowAddForm] = useState(false)
-  const [dashboardData, setDashboardData] = useState(null)
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/auth/signin")
     }
   }, [status, router])
-
-  useEffect(() => {
-    if (session) {
-      fetchDashboardData()
-    }
-  }, [session])
-
-  const fetchDashboardData = async () => {
-    try {
-      const response = await fetch("/api/tax-dashboard")
-      if (response.ok) {
-        const data = await response.json()
-        setDashboardData(data)
-      }
-    } catch (error) {
-      console.error("ダッシュボードデータ取得エラー:", error)
-    }
-  }
 
   if (status === "loading") {
     return (
@@ -59,45 +40,20 @@ export default function TaxDashboardPage() {
               <span className="text-sm text-gray-500">顧客先の一覧と詳細情報を管理します</span>
             </div>
             <div className="flex items-center space-x-4">
-              <button 
-                onClick={() => setShowAddForm(true)}
-                className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800"
-              >
-                + 新規顧客登録
-              </button>
-              <div className="text-sm text-gray-600">
-                {session.user?.name}さん
-              </div>
-              <button 
-                onClick={() => router.push("/")}
-                className="text-blue-600 hover:text-blue-800"
-              >
-                ← メインに戻る
-              </button>
+              <button onClick={() => setShowAddForm(true)} className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800">+ 新規顧客登録</button>
+              <div className="text-sm text-gray-600">{session.user?.name}さん</div>
+              <button onClick={() => router.push("/")} className="text-blue-600 hover:text-blue-800">← メインに戻る</button>
             </div>
           </div>
         </div>
       </header>
-
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0 space-y-8">
-          {/* ダッシュボード */}
-          <TaxDashboard 
-            clientStats={dashboardData?.clientStats}
-            monthlyRevenue={dashboardData?.monthlyRevenue}
-            revenueRanking={dashboardData?.revenueRanking}
-          />
-          
-          {/* 顧客テーブル */}
+          <TaxDashboard />
           <TaxClientsTable />
         </div>
       </main>
-
-      {/* 新規顧客追加フォーム */}
-      <TaxAddClientForm 
-        isOpen={showAddForm}
-        onClose={() => setShowAddForm(false)}
-      />
+      <TaxAddClientForm isOpen={showAddForm} onClose={() => setShowAddForm(false)} />
     </div>
   )
 }

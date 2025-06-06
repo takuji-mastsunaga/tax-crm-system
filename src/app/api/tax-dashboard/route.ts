@@ -19,11 +19,11 @@ export async function GET() {
     const clientsRef = collection(db, "tax-clients")
     const clientsQuery = query(clientsRef, orderBy("updatedAt", "desc"))
     const snapshot = await getDocs(clientsQuery)
-    const clients = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    const clients = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as Record<string, unknown> }))
 
     // ビラブル・ノンビラブル統計
     const totalClients = clients.length
-    const billableClients = clients.filter(client => client.isBillable).length
+    const billableClients = clients.filter((client: Record<string, unknown>) => Boolean(client.isBillable)).length
     const nonBillableClients = totalClients - billableClients
     const billableRate = totalClients > 0 ? (billableClients / totalClients) * 100 : 0
 
@@ -46,13 +46,13 @@ export async function GET() {
 
     // 収益ランキング
     const revenueRanking = clients
-      .sort((a, b) => (b.revenue || 0) - (a.revenue || 0))
+      .sort((a: Record<string, unknown>, b: Record<string, unknown>) => (Number(b.revenue) || 0) - (Number(a.revenue) || 0))
       .slice(0, 10)
-      .map((client, index) => ({
+      .map((client: Record<string, unknown>, index: number) => ({
         clientId: client.id,
-        companyName: client.companyName || "未設定",
-        revenue: client.revenue || 0,
-        profitRate: client.profitRate || 0,
+        companyName: String(client.companyName) || "未設定",
+        revenue: Number(client.revenue) || 0,
+        profitRate: Number(client.profitRate) || 0,
         rank: index + 1
       }))
 
