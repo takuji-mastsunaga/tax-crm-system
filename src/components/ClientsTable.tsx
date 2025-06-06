@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
+import { useSession } from "next-auth/react"
 // import { auth } from '@/app/auth'
 
 interface Client {
@@ -20,14 +21,14 @@ interface Client {
 
 export default function ClientsTable() {
   const [clients, setClients] = useState<Client[]>([])
-  const [loading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  // const { data: session } = useSession()
+  const { data: session } = useSession()
 
   useEffect(() => {
-//     // if (!session) {
-//       // setLoading(false)
-//       // return
+//     if (!session) {
+//       setLoading(false)
+//       return
 //     }
 
     const q = query(
@@ -47,18 +48,18 @@ export default function ClientsTable() {
           } as Client)
         })
         setClients(clientsData)
-        // setLoading(false)
+        setLoading(false)
         setError(null)
       },
       (error) => {
         console.error('Firestore error:', error)
         setError('データの取得に失敗しました。')
-        // setLoading(false)
+        setLoading(false)
       }
     )
 
     return () => unsubscribe()
-  }, [])
+  }, [session])
 
   if (loading) {
     return (
