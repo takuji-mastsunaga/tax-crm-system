@@ -12,12 +12,14 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@google-cloud/bigquery": "^8.1.0",
     "firebase": "^11.9.0",
     "firebase-admin": "^13.4.0",
     "next": "15.3.3",
     "next-auth": "^4.24.11",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "recharts": "^2.15.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
