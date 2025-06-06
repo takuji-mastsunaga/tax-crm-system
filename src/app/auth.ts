@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import NextAuth from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
+import { getServerSession } from "next-auth/next"
+import GoogleProvider from "next-auth/providers/google"
 
 const ALLOWED_EMAILS = [
   "tackjioffice@gmail.com",
   "t7810164825837@gmail.com"
-];
+]
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const authOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -17,25 +17,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async signIn({ user }: any) {
       if (user.email && ALLOWED_EMAILS.includes(user.email)) {
-        return true;
+        return true
       }
-      return false;
-    },
-    async jwt({ token, user }: any) {
-      if (user) {
-        token.uid = user.id;
-      }
-      return token;
-    },
-    async session({ session, token }: any) {
-      if (session.user) {
-        session.user.id = token.uid as string;
-      }
-      return session;
+      return false
     }
   },
   pages: {
     signIn: "/auth/signin",
     error: "/auth/error"
   }
-});
+}
+
+export const auth = () => getServerSession(authOptions)
