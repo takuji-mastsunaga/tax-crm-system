@@ -37,26 +37,43 @@ export default function EmployeeAddForm({ onClose, onSuccess }: EmployeeAddFormP
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/employees', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      })
+      // クライアントサイドで直接Firebaseに保存
+      const { collection, addDoc } = await import('firebase/firestore')
+      const { db } = await import('@/lib/firebase')
+      
+      // 従業員番号生成
+      const now = new Date()
+      const year = now.getFullYear()
+      const month = String(now.getMonth() + 1).padStart(2, '0')
+      const day = String(now.getDate()).padStart(2, '0')
+      const timestamp = now.getTime().toString().slice(-6)
+      const employeeNumber = `EMP${year}${month}${day}-${timestamp}`
 
-      if (response.ok) {
-        await response.json()
-        onSuccess({ ...formData, startDate: new Date(formData.startDate) })
-        alert('従業員の追加が完了しました。')
-        onClose()
-      } else {
-        const error = await response.json()
-        alert(error.error || '従業員の追加に失敗しました。')
+      const employeeData = {
+        employeeNumber,
+        name: formData.name,
+        email: formData.email,
+        workType: formData.workType,
+        dailyWorkingHours: formData.dailyWorkingHours,
+        monthlyWorkingDays: formData.monthlyWorkingDays,
+        hourlyRate: formData.hourlyRate,
+        department: formData.department || '',
+        position: formData.position || '',
+        startDate: new Date(formData.startDate),
+        status: 'active' as const,
+        createdAt: now,
+        updatedAt: now,
       }
+
+      const docRef = await addDoc(collection(db, 'employees'), employeeData)
+      
+      console.log('Employee created with ID: ', docRef.id)
+      onSuccess({ ...formData, startDate: new Date(formData.startDate) })
+      alert('従業員の追加が完了しました。')
+      onClose()
     } catch (error) {
       console.error('Error creating employee:', error)
-      alert('システムエラーが発生しました。')
+      alert('従業員の追加に失敗しました: ' + (error as Error).message)
     } finally {
       setIsLoading(false)
     }
