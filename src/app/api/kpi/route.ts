@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { getServerSession } from 'next-auth';
+import { auth } from '@/app/auth';
 
 // GET: KPIデータ取得
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await auth();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

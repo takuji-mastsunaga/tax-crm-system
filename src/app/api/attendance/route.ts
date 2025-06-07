@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { collection, addDoc, getDocs, query, where, orderBy, updateDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { getServerSession } from 'next-auth';
+import { auth } from '@/app/auth';
 import { AttendanceRecord } from '@/types/employee';
 
 // GET: 勤怠記録取得
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await auth();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
 // POST: 出退勤記録
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await auth();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

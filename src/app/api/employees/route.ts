@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { collection, addDoc, getDocs, query, orderBy, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { getServerSession } from 'next-auth';
+import { auth } from '@/app/auth';
 import { Employee } from '@/types/employee';
 
 // 従業員番号生成関数
@@ -18,7 +18,7 @@ function generateEmployeeNumber(): string {
 // GET: 従業員一覧取得または特定従業員取得
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await auth();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
 // POST: 新規従業員登録
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await auth();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

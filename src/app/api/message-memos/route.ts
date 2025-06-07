@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { collection, addDoc, getDocs, query, where, orderBy, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { getServerSession } from 'next-auth';
+import { auth } from '@/app/auth';
 import { MessageMemo } from '@/types/employee';
 
 // GET: 伝言メモ取得
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await auth();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
 // POST: 伝言メモ作成
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await auth();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
 // PUT: 伝言メモ更新（既読にする）
 export async function PUT(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await auth();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -182,7 +182,7 @@ export async function PUT(request: NextRequest) {
 // DELETE: 伝言メモ削除
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await auth();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
