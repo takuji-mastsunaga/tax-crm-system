@@ -911,9 +911,9 @@ export default function TaxAddClientForm({ isOpen, onClose }: { isOpen: boolean;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg w-full max-w-5xl max-h-[90vh] overflow-hidden">
+      <div className="bg-white rounded-lg w-full max-w-5xl max-h-[90vh] flex flex-col">
         {/* ヘッダー */}
-        <div className="p-6 border-b bg-purple-50">
+        <div className="p-6 border-b bg-purple-50 flex-shrink-0">
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">新規顧客登録（49項目）</h2>
@@ -936,13 +936,13 @@ export default function TaxAddClientForm({ isOpen, onClose }: { isOpen: boolean;
         </div>
         
         {/* コンテンツ */}
-        <form onSubmit={handleSubmit} className="flex flex-col h-full">
+        <form onSubmit={handleSubmit} className="flex flex-col h-full min-h-0">
           <div className="flex-1 overflow-y-auto p-6">
             {renderStep()}
           </div>
 
           {/* フッター */}
-          <div className="flex justify-between items-center p-6 border-t bg-gray-50">
+          <div className="flex justify-between items-center p-6 border-t bg-gray-50 flex-shrink-0">
             <div>
               {currentStep > 1 && (
                 <button
