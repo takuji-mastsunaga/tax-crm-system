@@ -1,52 +1,22 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import EmployeeDashboard from '@/components/EmployeeDashboard'
+import { useRouter } from 'next/navigation'
 
 export default function EmployeeDashboardPage() {
-  const { data: session, status } = useSession()
   const router = useRouter()
 
   useEffect(() => {
-    if (status === 'loading') return // まだロード中
+    // 従業員ダッシュボードはホーム画面に移動しました
+    router.push('/')
+  }, [router])
 
-    if (!session) {
-      router.push('/auth/signin')
-      return
-    }
-
-    // 許可されたアドレスまたはドメインかチェック
-    const userEmail = session.user?.email
-    const allowedEmails = [
-      'tackjioffice@gmail.com',
-      't7810164825837@gmail.com'
-    ]
-    const allowedDomains = ['solvis-group.com']
-
-    const isAllowedEmail = allowedEmails.includes(userEmail || '')
-    const isAllowedDomain = allowedDomains.some(domain => 
-      userEmail?.endsWith(`@${domain}`)
-    )
-
-    if (!isAllowedEmail && !isAllowedDomain) {
-      router.push('/auth/signin')
-      return
-    }
-  }, [session, status, router])
-
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">ホーム画面にリダイレクト中...</p>
       </div>
-    )
-  }
-
-  if (!session) {
-    return null
-  }
-
-  return <EmployeeDashboard />
+    </div>
+  )
 }
