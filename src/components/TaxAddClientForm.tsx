@@ -140,26 +140,36 @@ export default function TaxAddClientForm({ isOpen, onClose }: { isOpen: boolean;
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    console.log('=== フォーム送信開始 ===')
+    console.log('フォームデータ:', formData)
+    
     // 必須項目のバリデーション
     if (!formData.companyName.trim()) {
+      console.error('バリデーションエラー: 会社名が未入力')
       alert('会社名・氏名は必須項目です')
       return
     }
     if (!formData.representativeName.trim()) {
+      console.error('バリデーションエラー: 代表者名が未入力')
       alert('代表者名は必須項目です')
       return
     }
     if (!formData.phone1.trim()) {
+      console.error('バリデーションエラー: 電話番号1が未入力')
       alert('電話番号1は必須項目です')
       return
     }
     if (!formData.email.trim()) {
+      console.error('バリデーションエラー: メールアドレスが未入力')
       alert('メールアドレスは必須項目です')
       return
     }
     
+    console.log('✅ フロントエンドバリデーション通過')
+    
     try {
-      console.log('送信データ:', formData)
+      console.log('送信データ:', JSON.stringify(formData, null, 2))
+      console.log('送信先:', '/api/tax-clients')
       
       const response = await fetch('/api/tax-clients', {
         method: 'POST',
@@ -169,10 +179,18 @@ export default function TaxAddClientForm({ isOpen, onClose }: { isOpen: boolean;
         body: JSON.stringify(formData)
       })
 
+      console.log('HTTPレスポンス:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        headers: Object.fromEntries(response.headers.entries())
+      })
+
       const responseData = await response.json()
-      console.log('API応答:', responseData)
+      console.log('API応答データ:', JSON.stringify(responseData, null, 2))
 
       if (response.ok) {
+        console.log('✅ 登録成功')
         alert(`顧客情報が正常に登録されました\n顧客番号: ${responseData.clientNumber}`)
         // フォームをリセット
         setFormData({
@@ -242,13 +260,36 @@ export default function TaxAddClientForm({ isOpen, onClose }: { isOpen: boolean;
         // ページをリロードして最新データを表示
         window.location.reload()
       } else {
-        console.error('API エラー:', responseData)
-        alert(`登録に失敗しました: ${responseData.error || '不明なエラー'}`)
+        console.error('🚨 API エラー:', {
+          status: response.status,
+          statusText: response.statusText,
+          responseData
+        })
+        const errorMessage = responseData.error || responseData.details || `HTTP ${response.status}: ${response.statusText}`
+        alert(`登録に失敗しました: ${errorMessage}`)
+        
+        // 詳細エラー情報をコンソールに出力
+        if (responseData.details) {
+          console.error('詳細エラー:', responseData.details)
+        }
+        if (responseData.errorMessage) {
+          console.error('エラーメッセージ:', responseData.errorMessage)
+        }
       }
     } catch (error) {
-      console.error('送信エラー:', error)
-      alert('登録中にエラーが発生しました。ネットワーク接続を確認してください。')
+      console.error('🚨 送信エラー:', error)
+      console.error('エラータイプ:', typeof error)
+      console.error('エラーメッセージ:', error instanceof Error ? error.message : '不明なエラー')
+      console.error('エラースタック:', error instanceof Error ? error.stack : 'スタック情報なし')
+      
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        alert('ネットワークエラー: サーバーに接続できません。インターネット接続を確認してください。')
+      } else {
+        alert(`登録中にエラーが発生しました: ${error instanceof Error ? error.message : '不明なエラー'}`)
+      }
     }
+    
+    console.log('=== フォーム送信終了 ===')
   }
 
   if (!isOpen) return null

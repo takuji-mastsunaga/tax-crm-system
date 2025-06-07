@@ -39,9 +39,11 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     console.log('=== 顧客登録API開始 ===')
+    console.log('リクエストURL:', request.url)
+    console.log('リクエストメソッド:', request.method)
     
     const data = await request.json()
-    console.log('受信データ:', data)
+    console.log('受信データ:', JSON.stringify(data, null, 2))
 
     // 必須項目のバリデーション
     if (!data.companyName?.trim()) {
@@ -76,9 +78,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    console.log('✅ バリデーション通過')
+
     // 顧客番号の生成（現在の日時ベース）
     const now = new Date()
     const clientNumber = `CL${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`
+    console.log('生成された顧客番号:', clientNumber)
 
     // 49項目すべてを含むFirestore用データ構造
     const clientData = {
@@ -149,11 +154,18 @@ export async function POST(request: NextRequest) {
       internalRemarks: data.internalRemarks?.trim() || ''
     }
 
-    console.log('Firestore保存データ:', clientData)
+    console.log('Firestore保存データ準備完了')
+    console.log('データ項目数:', Object.keys(clientData).length)
+
+    // Firebase設定確認
+    console.log('Firebase設定確認:')
+    console.log('- db オブジェクト:', !!db)
+    console.log('- 環境変数 NEXT_PUBLIC_FIREBASE_PROJECT_ID:', process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID)
 
     // Firestoreに保存
+    console.log('Firestore保存開始...')
     const docRef = await addDoc(collection(db, 'tax-clients'), clientData)
-    console.log('Firestore保存完了. ドキュメントID:', docRef.id)
+    console.log('✅ Firestore保存完了. ドキュメントID:', docRef.id)
 
     // 🔄 Google Sheetsにも同時保存（一時的に無効化）
     console.log('=== Google Sheets同期開始（スキップ） ===')
@@ -168,15 +180,6 @@ export async function POST(request: NextRequest) {
       
       if (hasGoogleSheetsConfig) {
         console.log('⚠️ Google Sheets設定検出済みですが、一時的にスキップします')
-        // const { addClientToSheets } = await import('../../../lib/google-sheets')
-        // const sheetsData: ClientDataForSheets = clientData as ClientDataForSheets
-        // const sheetsSuccess = await addClientToSheets(sheetsData)
-        // 
-        // if (sheetsSuccess) {
-        //   console.log('✅ Google Sheets同期成功')
-        // } else {
-        //   console.warn('⚠️ Google Sheets同期失敗（Firestoreは正常保存）')
-        // }
       } else {
         console.log('ℹ️ Google Sheets環境変数未設定 - Firebase保存のみ実行')
       }
@@ -194,18 +197,35 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('=== 顧客登録API完了 ===')
-    console.log('レスポンス:', response)
+    console.log('レスポンス:', JSON.stringify(response, null, 2))
 
     return NextResponse.json(response, { status: 201 })
 
   } catch (error) {
     console.error('=== 顧客登録API エラー ===')
+    console.error('エラータイプ:', typeof error)
+    console.error('エラーメッセージ:', error instanceof Error ? error.message : '不明なエラー')
+    console.error('エラースタック:', error instanceof Error ? error.stack : 'スタック情報なし')
     console.error('エラー詳細:', error)
+    
+    // Firebase設定エラーの特別な処理
+    if (error instanceof Error && error.message.includes('Firebase')) {
+      console.error('🚨 Firebase設定エラーの可能性があります')
+      return NextResponse.json(
+        { 
+          error: 'データベース接続エラーが発生しました',
+          details: 'Firebase設定を確認してください',
+          errorMessage: error.message
+        },
+        { status: 500 }
+      )
+    }
     
     return NextResponse.json(
       { 
         error: 'サーバーエラーが発生しました',
-        details: error instanceof Error ? error.message : '不明なエラー'
+        details: error instanceof Error ? error.message : '不明なエラー',
+        timestamp: new Date().toISOString()
       },
       { status: 500 }
     )
