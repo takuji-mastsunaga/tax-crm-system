@@ -1,7 +1,7 @@
 {
-  "name": "tax-crm-system",
+  "name": "solvis-tax-accounting-system",
   "version": "1.0.0",
-  "description": "Tax CRM System with Firebase and BigQuery integration",
+  "description": "ソルビス税理士法人 従業員管理・業務支援システム - Employee Management & Business Support System",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -43,16 +43,18 @@
     "npm": ">=8.0.0"
   },
   "keywords": [
-    "tax",
-    "crm",
+    "税理士",
+    "会計",
+    "従業員管理",
+    "業務支援",
+    "ソルビス",
     "firebase",
-    "bigquery",
     "nextjs",
     "typescript"
   ],
-  "author": "Tax CRM Team",
+  "author": "ソルビス税理士法人 (SOLVIS TAX ACCOUNTING)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR_USERNAME/tax-crm-system.git"
+    "url": "https://github.com/YOUR_USERNAME/solvis-tax-accounting-system.git"
   }
 }
