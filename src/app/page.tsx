@@ -2,21 +2,48 @@
 
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ClientsTable from "@/components/ClientsTable";
 import { Suspense } from "react";
 
 export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [isCheckingEmployee, setIsCheckingEmployee] = useState(true);
 
+  // 従業員かどうかをチェックして適切なダッシュボードにリダイレクト
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/auth/signin");
-    }
-  }, [status, router]);
+    const checkEmployeeStatus = async () => {
+      if (status === "loading") return;
+      
+      if (status === "unauthenticated") {
+        router.push("/auth/signin");
+        return;
+      }
 
-  if (status === "loading") {
+      if (session?.user?.email) {
+        try {
+          const response = await fetch(`/api/employees?email=${session.user.email}`);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.employees && data.employees.length > 0) {
+              // 従業員として登録されている場合、従業員ダッシュボードにリダイレクト
+              router.push("/employee-dashboard");
+              return;
+            }
+          }
+        } catch (error) {
+          console.error('Error checking employee status:', error);
+        }
+      }
+      
+      setIsCheckingEmployee(false);
+    };
+
+    checkEmployeeStatus();
+  }, [session, status, router]);
+
+  if (status === "loading" || isCheckingEmployee) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>

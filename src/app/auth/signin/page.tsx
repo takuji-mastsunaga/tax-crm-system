@@ -2,9 +2,11 @@
 
 import { signIn } from "next-auth/react"
 import { useState } from "react"
+import EmployeeAddForm from "@/components/EmployeeAddForm"
 
 export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false)
+  const [showEmployeeForm, setShowEmployeeForm] = useState(false)
 
   const handleSignIn = async () => {
     setIsLoading(true)
@@ -62,8 +64,28 @@ export default function SignIn() {
               このシステムは許可された特定のアカウントのみアクセス可能です
             </p>
           </div>
+
+          {/* 従業員追加リンク */}
+          <div className="text-center mt-6">
+            <button
+              onClick={() => setShowEmployeeForm(true)}
+              className="text-xs text-blue-600 hover:text-blue-800 underline"
+            >
+              従業員追加
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* 従業員追加フォーム */}
+      {showEmployeeForm && (
+        <EmployeeAddForm
+          onClose={() => setShowEmployeeForm(false)}
+          onSuccess={() => {
+            console.log('Employee added successfully')
+          }}
+        />
+      )}
     </div>
   )
 } 
