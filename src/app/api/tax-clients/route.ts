@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { collection, addDoc, getDocs, query, orderBy } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import { addClientToSheets, ClientDataForSheets } from '../../../lib/google-sheets'
+// import { addClientToSheets, ClientDataForSheets } from '../../../lib/google-sheets'
 
 // GET: 顧客一覧取得
 export async function GET() {
@@ -155,16 +155,30 @@ export async function POST(request: NextRequest) {
     const docRef = await addDoc(collection(db, 'tax-clients'), clientData)
     console.log('Firestore保存完了. ドキュメントID:', docRef.id)
 
-    // 🔄 Google Sheetsにも同時保存
-    console.log('=== Google Sheets同期開始 ===')
+    // 🔄 Google Sheetsにも同時保存（一時的に無効化）
+    console.log('=== Google Sheets同期開始（スキップ） ===')
     try {
-      const sheetsData: ClientDataForSheets = clientData as ClientDataForSheets
-      const sheetsSuccess = await addClientToSheets(sheetsData)
+      // 環境変数チェック
+      const hasGoogleSheetsConfig = !!(
+        process.env.GOOGLE_SHEETS_ID && 
+        process.env.GOOGLE_PROJECT_ID && 
+        process.env.GOOGLE_PRIVATE_KEY &&
+        process.env.GOOGLE_CLIENT_EMAIL
+      )
       
-      if (sheetsSuccess) {
-        console.log('✅ Google Sheets同期成功')
+      if (hasGoogleSheetsConfig) {
+        console.log('⚠️ Google Sheets設定検出済みですが、一時的にスキップします')
+        // const { addClientToSheets } = await import('../../../lib/google-sheets')
+        // const sheetsData: ClientDataForSheets = clientData as ClientDataForSheets
+        // const sheetsSuccess = await addClientToSheets(sheetsData)
+        // 
+        // if (sheetsSuccess) {
+        //   console.log('✅ Google Sheets同期成功')
+        // } else {
+        //   console.warn('⚠️ Google Sheets同期失敗（Firestoreは正常保存）')
+        // }
       } else {
-        console.warn('⚠️ Google Sheets同期失敗（Firestoreは正常保存）')
+        console.log('ℹ️ Google Sheets環境変数未設定 - Firebase保存のみ実行')
       }
     } catch (sheetsError) {
       console.error('🚨 Google Sheets同期エラー:', sheetsError)
@@ -176,7 +190,7 @@ export async function POST(request: NextRequest) {
       success: true,
       clientNumber,
       documentId: docRef.id,
-      message: '顧客情報が正常に登録されました（Firebase + Google Sheets）'
+      message: '顧客情報が正常に登録されました（Firebase保存完了）'
     }
 
     console.log('=== 顧客登録API完了 ===')
