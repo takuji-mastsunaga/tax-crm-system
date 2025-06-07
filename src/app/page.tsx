@@ -11,36 +11,16 @@ export default function Home() {
   const router = useRouter();
   const [isCheckingEmployee, setIsCheckingEmployee] = useState(true);
 
-  // 従業員かどうかをチェックして適切なダッシュボードにリダイレクト
+  // 認証チェック
   useEffect(() => {
-    const checkEmployeeStatus = async () => {
-      if (status === "loading") return;
-      
-      if (status === "unauthenticated") {
-        router.push("/auth/signin");
-        return;
-      }
-
-      if (session?.user?.email) {
-        try {
-          const response = await fetch(`/api/employees?email=${session.user.email}`);
-          if (response.ok) {
-            const data = await response.json();
-            if (data.employees && data.employees.length > 0) {
-              // 従業員として登録されている場合、従業員ダッシュボードにリダイレクト
-              router.push("/employee-dashboard");
-              return;
-            }
-          }
-        } catch (error) {
-          console.error('Error checking employee status:', error);
-        }
-      }
-      
-      setIsCheckingEmployee(false);
-    };
-
-    checkEmployeeStatus();
+    if (status === "loading") return;
+    
+    if (status === "unauthenticated") {
+      router.push("/auth/signin");
+      return;
+    }
+    
+    setIsCheckingEmployee(false);
   }, [session, status, router]);
 
   if (status === "loading" || isCheckingEmployee) {
@@ -116,7 +96,8 @@ export default function Home() {
                 <h3 className="text-lg font-semibold text-gray-900 ml-3">従業員ワークフロー</h3>
               </div>
               <p className="text-gray-600 mb-4">
-                出退勤管理、勤怠記録、メモ共有、スケジュール管理、KPIダッシュボードが利用できます。
+                出退勤管理、勤怠記録、メモ共有、スケジュール管理、KPIダッシュボードが利用できます。<br/>
+                <span className="text-sm text-blue-600">※ ログイン後すぐに体験できます</span>
               </p>
               <button 
                 onClick={() => router.push("/employee-dashboard")}

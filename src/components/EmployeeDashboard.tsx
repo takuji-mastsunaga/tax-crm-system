@@ -19,7 +19,6 @@ import MessageMemoCarousel from './MessageMemoCarousel'
 import MessageMemoForm from './MessageMemoForm'
 import WeeklyCalendar from './WeeklyCalendar'
 import KPIDashboard from './KPIDashboard'
-import EmployeeAddForm from './EmployeeAddForm'
 
 interface Employee {
   id: string
@@ -45,8 +44,6 @@ export default function EmployeeDashboard() {
   const [activeSection, setActiveSection] = useState('dashboard')
   const [showWorkLogForm, setShowWorkLogForm] = useState(false)
   const [showMemoForm, setShowMemoForm] = useState(false)
-  const [showEmployeeAddForm, setShowEmployeeAddForm] = useState(false)
-  const [isLoadingEmployee, setIsLoadingEmployee] = useState(true)
 
   // 現在時刻の更新
   useEffect(() => {
@@ -66,18 +63,32 @@ export default function EmployeeDashboard() {
 
   const fetchEmployeeData = async (email: string) => {
     try {
-      setIsLoadingEmployee(true)
       const response = await fetch(`/api/employees?email=${email}`)
       if (response.ok) {
         const data = await response.json()
         if (data.employees && data.employees.length > 0) {
           setEmployee(data.employees[0])
+        } else {
+          // 従業員情報がない場合はダミーデータを設定
+          setEmployee({
+            id: 'demo-user',
+            name: session?.user?.name || 'デモユーザー',
+            email: email,
+            department: 'デモ部署',
+            position: 'デモ職位'
+          })
         }
       }
     } catch (error) {
       console.error('Error fetching employee data:', error)
-    } finally {
-      setIsLoadingEmployee(false)
+      // エラーの場合もダミーデータを設定
+      setEmployee({
+        id: 'demo-user',
+        name: session?.user?.name || 'デモユーザー',
+        email: email,
+        department: 'デモ部署',
+        position: 'デモ職位'
+      })
     }
   }
 
@@ -144,20 +155,6 @@ export default function EmployeeDashboard() {
     }
   }
 
-  const handleEmployeeAddSuccess = (newEmployee: Partial<Employee>) => {
-    setEmployee({
-      id: 'temp-id',
-      name: newEmployee.name || '',
-      email: newEmployee.email || '',
-      department: newEmployee.department,
-      position: newEmployee.position
-    })
-    setShowEmployeeAddForm(false)
-    // 新しい従業員情報で再読み込み
-    if (session?.user?.email) {
-      fetchEmployeeData(session.user.email)
-    }
-  }
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('ja-JP', { 
@@ -193,64 +190,6 @@ export default function EmployeeDashboard() {
     return <div>Loading...</div>
   }
 
-  // 従業員情報の読み込み中
-  if (isLoadingEmployee) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-      </div>
-    )
-  }
-
-  // 従業員情報が存在しない場合の初期設定画面
-  if (!employee) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8">
-          <div className="text-center mb-6">
-            <div className="bg-indigo-100 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-              <UserGroupIcon className="w-8 h-8 text-indigo-600" />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">従業員ワークフローシステム</h1>
-            <p className="text-gray-600">
-              初回利用時は従業員情報の登録が必要です。<br/>
-              下記ボタンから従業員情報を登録してください。
-            </p>
-          </div>
-          
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-blue-900 mb-2">このシステムの機能</h3>
-            <ul className="text-sm text-blue-800 space-y-1">
-              <li>• 出退勤管理と勤怠記録</li>
-              <li>• 作業ログとKPIトラッキング</li>
-              <li>• 伝言メモの共有機能</li>
-              <li>• 週間カレンダーとスケジュール管理</li>
-              <li>• 売上・請求データのダッシュボード</li>
-            </ul>
-          </div>
-
-          <button
-            onClick={() => setShowEmployeeAddForm(true)}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-md transition-colors"
-          >
-            従業員情報を登録する
-          </button>
-          
-          <p className="text-xs text-gray-500 text-center mt-4">
-            現在ログイン中: {session.user?.email}
-          </p>
-        </div>
-
-        {/* 従業員追加フォーム */}
-        {showEmployeeAddForm && (
-          <EmployeeAddForm
-            onClose={() => setShowEmployeeAddForm(false)}
-            onSuccess={handleEmployeeAddSuccess}
-          />
-        )}
-      </div>
-    )
-  }
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -368,42 +307,6 @@ export default function EmployeeDashboard() {
         <main className="flex-1 p-6 overflow-auto">
           {activeSection === 'kpi' ? (
             employee && <KPIDashboard employeeId={employee.id} employeeName={employee.name} />
-          ) : activeSection === 'employees' ? (
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">従業員管理</h2>
-                <button
-                  onClick={() => setShowEmployeeAddForm(true)}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md flex items-center space-x-2"
-                >
-                  <UserGroupIcon className="h-5 w-5" />
-                  <span>従業員追加</span>
-                </button>
-              </div>
-              
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <h3 className="font-semibold text-blue-900 mb-2">従業員システム管理</h3>
-                <p className="text-sm text-blue-800">
-                  新しい従業員をシステムに追加できます。従業員情報を登録すると、勤怠管理・作業ログ・メモ機能が利用可能になります。
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h4 className="font-medium text-gray-900 mb-2">現在の従業員</h4>
-                  <div className="flex items-center space-x-3">
-                    <div className="h-10 w-10 bg-indigo-600 rounded-full flex items-center justify-center">
-                      <span className="text-white font-medium">{employee?.name?.charAt(0)}</span>
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{employee?.name}</p>
-                      <p className="text-sm text-gray-600">{employee?.email}</p>
-                      <p className="text-xs text-gray-500">{employee?.department || '部署未設定'}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* お知らせ・進捗管理カード */}
@@ -546,13 +449,6 @@ export default function EmployeeDashboard() {
         />
       )}
 
-      {/* 従業員追加フォーム */}
-      {showEmployeeAddForm && (
-        <EmployeeAddForm
-          onClose={() => setShowEmployeeAddForm(false)}
-          onSuccess={handleEmployeeAddSuccess}
-        />
-      )}
     </div>
   )
 }
