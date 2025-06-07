@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { collection, addDoc, getDocs, query, orderBy, where, doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { auth } from '@/app/auth';
+import { adminDb } from '@/lib/firebase-admin';
 import { Employee } from '@/types/employee';
 
 // 従業員番号生成関数
@@ -18,71 +16,66 @@ function generateEmployeeNumber(): string {
 // GET: 従業員一覧取得または特定従業員取得
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // 許可されたメールアドレス・ドメインチェック
-    const userEmail = session.user?.email;
-    const allowedEmails = ['tackjioffice@gmail.com', 't7810164825837@gmail.com'];
-    const allowedDomains = ['solvis-group.com'];
-    
-    const isAllowedEmail = allowedEmails.includes(userEmail || '');
-    const isAllowedDomain = allowedDomains.some(domain => 
-      userEmail?.endsWith(`@${domain}`)
-    );
-    
-    if (!isAllowedEmail && !isAllowedDomain) {
-      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
-    }
+    console.log('Fetching employees with Admin SDK...');
 
     const url = new URL(request.url);
     const email = url.searchParams.get('email');
     const employeeId = url.searchParams.get('employeeId');
 
-    const employeesRef = collection(db, 'employees');
-    let q;
+    const employeesRef = adminDb.collection('employees');
 
     if (email) {
       // メールアドレスで特定従業員を検索
-      q = query(employeesRef, where('email', '==', email));
+      const snapshot = await employeesRef.where('email', '==', email).get();
+      const employees: Employee[] = [];
+      
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        employees.push({
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate(),
+          updatedAt: data.updatedAt?.toDate(),
+          startDate: data.startDate?.toDate(),
+        } as Employee);
+      });
+
+      return NextResponse.json({ employees }, { status: 200 });
     } else if (employeeId) {
       // 従業員IDで特定従業員を検索
-      const docRef = doc(db, 'employees', employeeId);
-      const docSnap = await getDoc(docRef);
+      const doc = await employeesRef.doc(employeeId).get();
       const employees: Employee[] = [];
-      if (docSnap.exists()) {
-        const data = docSnap.data();
+      
+      if (doc.exists) {
+        const data = doc.data()!;
         employees.push({
-          id: docSnap.id,
+          id: doc.id,
           ...data,
           createdAt: data.createdAt?.toDate(),
           updatedAt: data.updatedAt?.toDate(),
           startDate: data.startDate?.toDate(),
         } as Employee);
       }
+      
       return NextResponse.json({ employees }, { status: 200 });
     } else {
       // 全従業員一覧取得
-      q = query(employeesRef, orderBy('createdAt', 'desc'));
+      const snapshot = await employeesRef.orderBy('createdAt', 'desc').get();
+      const employees: Employee[] = [];
+      
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        employees.push({
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate(),
+          updatedAt: data.updatedAt?.toDate(),
+          startDate: data.startDate?.toDate(),
+        } as Employee);
+      });
+
+      return NextResponse.json({ employees }, { status: 200 });
     }
-
-    const querySnapshot = await getDocs(q);
-    
-    const employees: Employee[] = [];
-    querySnapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      employees.push({
-        id: docSnap.id,
-        ...data,
-        createdAt: data.createdAt?.toDate(),
-        updatedAt: data.updatedAt?.toDate(),
-        startDate: data.startDate?.toDate(),
-      } as Employee);
-    });
-
-    return NextResponse.json({ employees }, { status: 200 });
   } catch (error) {
     console.error('Error fetching employees:', error);
     return NextResponse.json(
@@ -95,8 +88,7 @@ export async function GET(request: NextRequest) {
 // POST: 新規従業員登録
 export async function POST(request: NextRequest) {
   try {
-    // 開発環境では認証チェックをスキップ
-    console.log('Processing employee creation request...');
+    console.log('Creating employee with Admin SDK...');
 
     const body = await request.json();
     const {
@@ -119,9 +111,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const employeesRef = adminDb.collection('employees');
+
     // メールアドレスの重複チェック
-    const emailQuery = query(collection(db, 'employees'), where('email', '==', email));
-    const emailSnapshot = await getDocs(emailQuery);
+    const emailSnapshot = await employeesRef.where('email', '==', email).get();
     if (!emailSnapshot.empty) {
       return NextResponse.json(
         { error: 'Email already exists' },
@@ -146,7 +139,7 @@ export async function POST(request: NextRequest) {
       updatedAt: body.updatedAt ? new Date(body.updatedAt) : now,
     };
 
-    const docRef = await addDoc(collection(db, 'employees'), employeeData);
+    const docRef = await employeesRef.add(employeeData);
     
     return NextResponse.json(
       {

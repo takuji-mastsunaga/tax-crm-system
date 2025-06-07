@@ -1,16 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { collection, addDoc, getDocs, query, where, orderBy, updateDoc, doc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { auth } from '@/app/auth';
+import { adminDb } from '@/lib/firebase-admin';
 import { AttendanceRecord } from '@/types/employee';
 
 // GET: 勤怠記録取得
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    console.log('Fetching attendance records with Admin SDK...');
 
     const url = new URL(request.url);
     const employeeId = url.searchParams.get('employeeId');
@@ -20,9 +15,8 @@ export async function GET(request: NextRequest) {
     // emailが提供された場合、まず従業員IDを取得
     let actualEmployeeId = employeeId;
     if (email && !employeeId) {
-      const employeesRef = collection(db, 'employees');
-      const employeeQuery = query(employeesRef, where('email', '==', email));
-      const employeeSnapshot = await getDocs(employeeQuery);
+      const employeesRef = adminDb.collection('employees');
+      const employeeSnapshot = await employeesRef.where('email', '==', email).get();
       
       if (!employeeSnapshot.empty) {
         actualEmployeeId = employeeSnapshot.docs[0].id;
@@ -31,33 +25,27 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    let q;
-    if (actualEmployeeId && date) {
-      q = query(
-        collection(db, 'attendance'),
-        where('employeeId', '==', actualEmployeeId),
-        where('date', '==', date)
-      );
-    } else if (actualEmployeeId) {
-      q = query(
-        collection(db, 'attendance'),
-        where('employeeId', '==', actualEmployeeId),
-        orderBy('date', 'desc')
-      );
-    } else if (date) {
-      q = query(
-        collection(db, 'attendance'),
-        where('date', '==', date),
-        orderBy('createdAt', 'desc')
-      );
-    } else {
-      q = query(
-        collection(db, 'attendance'),
-        orderBy('date', 'desc')
-      );
-    }
+    const attendanceRef = adminDb.collection('attendance');
+    let querySnapshot;
 
-    const querySnapshot = await getDocs(q);
+    if (actualEmployeeId && date) {
+      querySnapshot = await attendanceRef
+        .where('employeeId', '==', actualEmployeeId)
+        .where('date', '==', date)
+        .get();
+    } else if (actualEmployeeId) {
+      querySnapshot = await attendanceRef
+        .where('employeeId', '==', actualEmployeeId)
+        .orderBy('date', 'desc')
+        .get();
+    } else if (date) {
+      querySnapshot = await attendanceRef
+        .where('date', '==', date)
+        .orderBy('createdAt', 'desc')
+        .get();
+    } else {
+      querySnapshot = await attendanceRef.orderBy('date', 'desc').get();
+    }
     const records: AttendanceRecord[] = [];
     
     querySnapshot.forEach((doc) => {
@@ -85,10 +73,7 @@ export async function GET(request: NextRequest) {
 // POST: 出退勤記録
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    console.log('Processing attendance with Admin SDK...');
 
     const body = await request.json();
     const { employeeId, action } = body; // action: 'clock-in' | 'clock-out'
@@ -103,13 +88,13 @@ export async function POST(request: NextRequest) {
     const now = new Date();
     const today = now.toISOString().split('T')[0]; // YYYY-MM-DD形式
 
+    const attendanceRef = adminDb.collection('attendance');
+
     // 今日の勤怠記録を確認
-    const todayQuery = query(
-      collection(db, 'attendance'),
-      where('employeeId', '==', employeeId),
-      where('date', '==', today)
-    );
-    const todaySnapshot = await getDocs(todayQuery);
+    const todaySnapshot = await attendanceRef
+      .where('employeeId', '==', employeeId)
+      .where('date', '==', today)
+      .get();
 
     if (action === 'clock-in') {
       // 出勤処理
@@ -135,7 +120,7 @@ export async function POST(request: NextRequest) {
 
       if (todaySnapshot.empty) {
         // 新規レコード作成
-        const docRef = await addDoc(collection(db, 'attendance'), attendanceData);
+        const docRef = await attendanceRef.add(attendanceData);
         return NextResponse.json(
           {
             message: 'Clock in successful',
@@ -147,7 +132,7 @@ export async function POST(request: NextRequest) {
       } else {
         // 既存レコード更新
         const existingDoc = todaySnapshot.docs[0];
-        await updateDoc(doc(db, 'attendance', existingDoc.id), {
+        await existingDoc.ref.update({
           clockInTime: now,
           status: 'present',
           updatedAt: now
@@ -190,7 +175,7 @@ export async function POST(request: NextRequest) {
       const clockInTime = existingData.clockInTime.toDate();
       const totalWorkingHours = (now.getTime() - clockInTime.getTime()) / (1000 * 60 * 60); // 時間単位
 
-      await updateDoc(doc(db, 'attendance', existingDoc.id), {
+      await existingDoc.ref.update({
         clockOutTime: now,
         totalWorkingHours: Math.round(totalWorkingHours * 100) / 100, // 小数点2桁
         updatedAt: now
