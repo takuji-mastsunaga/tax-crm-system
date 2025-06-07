@@ -37,10 +37,6 @@ export default function EmployeeAddForm({ onClose, onSuccess }: EmployeeAddFormP
     setIsLoading(true)
 
     try {
-      // Firebase Cloud Firestoreに直接接続（認証なしアプローチ）
-      const { collection, addDoc } = await import('firebase/firestore')
-      const { db } = await import('@/lib/firebase')
-      
       // 従業員番号生成
       const now = new Date()
       const year = now.getFullYear()
@@ -59,16 +55,30 @@ export default function EmployeeAddForm({ onClose, onSuccess }: EmployeeAddFormP
         hourlyRate: formData.hourlyRate,
         department: formData.department || '',
         position: formData.position || '',
-        startDate: new Date(formData.startDate),
+        startDate: formData.startDate,
         status: 'active' as const,
-        createdAt: now,
-        updatedAt: now,
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
       }
 
       console.log('Attempting to save employee data:', employeeData)
-      const docRef = await addDoc(collection(db, 'employees'), employeeData)
       
-      console.log('Employee created with ID: ', docRef.id)
+      // API経由でのデータ保存
+      const response = await fetch('/api/employees', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(employeeData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+      }
+
+      const result = await response.json()
+      console.log('Employee created successfully:', result)
       onSuccess({ ...formData, startDate: new Date(formData.startDate) })
       alert('従業員の追加が完了しました！')
       onClose()

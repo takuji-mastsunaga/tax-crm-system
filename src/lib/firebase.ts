@@ -17,7 +17,7 @@ const app = initializeApp(firebaseConfig);
 // Firebase Auth
 export const auth = getAuth(app);
 
-// japan-db データベースに接続
-export const db = getFirestore(app, "japan-db");
+// デフォルトデータベースに接続
+export const db = getFirestore(app);
 
 export default app; 
