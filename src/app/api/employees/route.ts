@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { collection, addDoc, getDocs, query, orderBy, where } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, where, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { auth } from '@/app/auth';
 import { Employee } from '@/types/employee';
@@ -23,6 +23,20 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // 許可されたメールアドレス・ドメインチェック
+    const userEmail = session.user?.email;
+    const allowedEmails = ['tackjioffice@gmail.com', 't7810164825837@gmail.com'];
+    const allowedDomains = ['solvis-group.com'];
+    
+    const isAllowedEmail = allowedEmails.includes(userEmail || '');
+    const isAllowedDomain = allowedDomains.some(domain => 
+      userEmail?.endsWith(`@${domain}`)
+    );
+    
+    if (!isAllowedEmail && !isAllowedDomain) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+    }
+
     const url = new URL(request.url);
     const email = url.searchParams.get('email');
     const employeeId = url.searchParams.get('employeeId');
@@ -35,7 +49,20 @@ export async function GET(request: NextRequest) {
       q = query(employeesRef, where('email', '==', email));
     } else if (employeeId) {
       // 従業員IDで特定従業員を検索
-      q = query(employeesRef, where('__name__', '==', employeeId));
+      const docRef = doc(db, 'employees', employeeId);
+      const docSnap = await getDoc(docRef);
+      const employees: Employee[] = [];
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        employees.push({
+          id: docSnap.id,
+          ...data,
+          createdAt: data.createdAt?.toDate(),
+          updatedAt: data.updatedAt?.toDate(),
+          startDate: data.startDate?.toDate(),
+        } as Employee);
+      }
+      return NextResponse.json({ employees }, { status: 200 });
     } else {
       // 全従業員一覧取得
       q = query(employeesRef, orderBy('createdAt', 'desc'));
@@ -44,10 +71,10 @@ export async function GET(request: NextRequest) {
     const querySnapshot = await getDocs(q);
     
     const employees: Employee[] = [];
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
+    querySnapshot.forEach((docSnap) => {
+      const data = docSnap.data();
       employees.push({
-        id: doc.id,
+        id: docSnap.id,
         ...data,
         createdAt: data.createdAt?.toDate(),
         updatedAt: data.updatedAt?.toDate(),
@@ -73,6 +100,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // 許可されたメールアドレス・ドメインチェック
+    const userEmail = session.user?.email;
+    const allowedEmails = ['tackjioffice@gmail.com', 't7810164825837@gmail.com'];
+    const allowedDomains = ['solvis-group.com'];
+    
+    const isAllowedEmail = allowedEmails.includes(userEmail || '');
+    const isAllowedDomain = allowedDomains.some(domain => 
+      userEmail?.endsWith(`@${domain}`)
+    );
+    
+    if (!isAllowedEmail && !isAllowedDomain) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+    }
+
     const body = await request.json();
     const {
       name,
@@ -95,10 +136,7 @@ export async function POST(request: NextRequest) {
     }
 
     // メールアドレスの重複チェック
-    const emailQuery = query(
-      collection(db, 'employees'),
-      where('email', '==', email)
-    );
+    const emailQuery = query(collection(db, 'employees'), where('email', '==', email));
     const emailSnapshot = await getDocs(emailQuery);
     if (!emailSnapshot.empty) {
       return NextResponse.json(
