@@ -1,7 +1,7 @@
 "use client"
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
 import { useState } from "react"
-import { CheckCircle, ArrowPathIcon, XCircleIcon, DocumentTextIcon } from "@heroicons/react/24/outline"
+import { CheckCircleIcon, ArrowPathIcon, XCircleIcon, DocumentTextIcon } from "@heroicons/react/24/outline"
 
 export default function TaxDashboard() {
   const [clients, setClients] = useState<any[]>([])
@@ -94,7 +94,7 @@ export default function TaxDashboard() {
               sheetsSyncStatus === 'error' ? 'bg-red-100' : 'bg-gray-100'
             }`}>
               {sheetsSyncStatus === 'success' ? (
-                <CheckCircle className={`w-6 h-6 text-green-600`} />
+                <CheckCircleIcon className={`w-6 h-6 text-green-600`} />
               ) : sheetsSyncStatus === 'syncing' ? (
                 <ArrowPathIcon className={`w-6 h-6 text-blue-600 animate-spin`} />
               ) : sheetsSyncStatus === 'error' ? (
