@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { collection, addDoc, getDocs, query, orderBy } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
+import { addClientToSheets, ClientDataForSheets } from '../../../lib/google-sheets'
 
 // GET: 顧客一覧取得
 export async function GET() {
@@ -154,12 +155,28 @@ export async function POST(request: NextRequest) {
     const docRef = await addDoc(collection(db, 'tax-clients'), clientData)
     console.log('Firestore保存完了. ドキュメントID:', docRef.id)
 
+    // 🔄 Google Sheetsにも同時保存
+    console.log('=== Google Sheets同期開始 ===')
+    try {
+      const sheetsData: ClientDataForSheets = clientData as ClientDataForSheets
+      const sheetsSuccess = await addClientToSheets(sheetsData)
+      
+      if (sheetsSuccess) {
+        console.log('✅ Google Sheets同期成功')
+      } else {
+        console.warn('⚠️ Google Sheets同期失敗（Firestoreは正常保存）')
+      }
+    } catch (sheetsError) {
+      console.error('🚨 Google Sheets同期エラー:', sheetsError)
+      // Google SheetsエラーでもFirestore保存は成功なので処理続行
+    }
+
     // 成功レスポンス
     const response = {
       success: true,
       clientNumber,
       documentId: docRef.id,
-      message: '顧客情報が正常に登録されました'
+      message: '顧客情報が正常に登録されました（Firebase + Google Sheets）'
     }
 
     console.log('=== 顧客登録API完了 ===')
