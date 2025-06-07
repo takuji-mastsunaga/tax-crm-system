@@ -37,7 +37,7 @@ export default function EmployeeAddForm({ onClose, onSuccess }: EmployeeAddFormP
     setIsLoading(true)
 
     try {
-      // クライアントサイドで直接Firebaseに保存
+      // Firebase Cloud Firestoreに直接接続（認証なしアプローチ）
       const { collection, addDoc } = await import('firebase/firestore')
       const { db } = await import('@/lib/firebase')
       
@@ -65,15 +65,25 @@ export default function EmployeeAddForm({ onClose, onSuccess }: EmployeeAddFormP
         updatedAt: now,
       }
 
+      console.log('Attempting to save employee data:', employeeData)
       const docRef = await addDoc(collection(db, 'employees'), employeeData)
       
       console.log('Employee created with ID: ', docRef.id)
       onSuccess({ ...formData, startDate: new Date(formData.startDate) })
-      alert('従業員の追加が完了しました。')
+      alert('従業員の追加が完了しました！')
       onClose()
     } catch (error) {
       console.error('Error creating employee:', error)
-      alert('従業員の追加に失敗しました: ' + (error as Error).message)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      alert('従業員の追加に失敗しました: ' + errorMessage)
+      
+      // 詳細なエラー情報をログ出力
+      console.error('Detailed error:', {
+        error,
+        message: errorMessage,
+        code: (error as Error & { code?: string })?.code,
+        stack: (error as Error)?.stack
+      })
     } finally {
       setIsLoading(false)
     }
