@@ -1,23 +1,6 @@
-import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/app/auth"
-import { collection, addDoc, getDocs, query, orderBy, where } from "firebase/firestore"
-import { db } from "@/lib/firebase"
-import { firestore } from '../../../lib/firebase'
-
-const ALLOWED_EMAILS = [
-  "tackjioffice@gmail.com",
-  "t7810164825837@gmail.com"
-]
-
-// 顧客番号生成関数
-function generateClientNumber(companyName: string, year: number = new Date().getFullYear()): string {
-  const corporateKeywords = ["株", "有限", "合同", "会社", "法人", "団体"]
-  const isCorporate = corporateKeywords.some(keyword => companyName.includes(keyword))
-  const companyType = isCorporate ? "1" : "2"
-  const yearSuffix = year.toString().slice(-2)
-  const sequentialNumber = Math.floor(Math.random() * 9999).toString().padStart(4, "0")
-  return companyType + yearSuffix + sequentialNumber
-}
+import { NextRequest, NextResponse } from 'next/server'
+import { collection, addDoc, getDocs, query, orderBy } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
 
 // GET: 顧客一覧取得
 export async function GET() {
@@ -27,7 +10,7 @@ export async function GET() {
     const q = query(collection(db, 'tax-clients'), orderBy('createdAt', 'desc'))
     const snapshot = await getDocs(q)
 
-    const clients = snapshot.docs.map((doc: any) => ({
+    const clients = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data()
     }))
