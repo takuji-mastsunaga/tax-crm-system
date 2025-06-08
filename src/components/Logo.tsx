@@ -34,108 +34,124 @@ export default function Logo({ size = 'md', variant = 'light', showText = true, 
 
   return (
     <div className={`flex items-center space-x-3 ${className}`}>
-      {/* SOLVISロゴアイコン - 提供された太陽と水面のデザイン */}
-      <div className={`${sizeClasses[size]} relative flex items-center justify-center`}>
-        <svg 
-          viewBox="0 0 120 120" 
-          className="w-full h-full" 
-          fill="none"
-        >
-          <defs>
-            <linearGradient id="sunGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style={{ stopColor: '#60a5fa', stopOpacity: 1 }} />
-              <stop offset="50%" style={{ stopColor: '#3b82f6', stopOpacity: 1 }} />
-              <stop offset="100%" style={{ stopColor: '#1e40af', stopOpacity: 1 }} />
-            </linearGradient>
-            <linearGradient id="waterGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style={{ stopColor: '#93c5fd', stopOpacity: 0.8 }} />
-              <stop offset="100%" style={{ stopColor: '#60a5fa', stopOpacity: 0.6 }} />
-            </linearGradient>
-          </defs>
-          
-          {/* 太陽の放射線 - 提供された画像に基づく */}
-          <g stroke={variant === 'light' ? '#60a5fa' : '#3b82f6'} strokeWidth="2.5" strokeLinecap="round">
-            {/* メインの8方向放射線 */}
-            <line x1="60" y1="8" x2="60" y2="25" />
-            <line x1="60" y1="95" x2="60" y2="112" />
-            <line x1="8" y1="60" x2="25" y2="60" />
-            <line x1="95" y1="60" x2="112" y2="60" />
-            <line x1="21.2" y1="21.2" x2="32.7" y2="32.7" />
-            <line x1="87.3" y1="87.3" x2="98.8" y2="98.8" />
-            <line x1="98.8" y1="21.2" x2="87.3" y2="32.7" />
-            <line x1="32.7" y1="87.3" x2="21.2" y2="98.8" />
+      {/* SOLVISロゴアイコン - 提供された画像を再現したSVG */}
+      <div className={`${sizeClasses[size]} relative flex items-center justify-center rounded-lg overflow-hidden shadow-sm`}>
+        <img
+          src="/solvis-logo-original.svg"
+          alt="SOLVIS Tax Accounting Logo"
+          className="w-full h-full object-contain"
+          style={{ 
+            filter: variant === 'dark' ? 'brightness(0.95) contrast(1.05)' : 'brightness(1) contrast(1.1)',
+          }}
+          onError={(e) => {
+            // フォールバック用のインラインSVG
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+            const fallback = target.nextElementSibling as HTMLElement;
+            if (fallback) fallback.style.display = 'block';
+          }}
+        />
+        
+        {/* フォールバック用のインラインSVG */}
+        <div className="w-full h-full absolute inset-0 hidden">
+          <svg 
+            viewBox="0 0 400 400" 
+            className="w-full h-full" 
+            fill="none"
+          >
+            {/* 白い背景 */}
+            <rect width="400" height="400" fill="white"/>
             
-            {/* 中間の16方向放射線 */}
-            <line x1="38.5" y1="12.8" x2="43.2" y2="22.5" />
-            <line x1="81.5" y1="12.8" x2="76.8" y2="22.5" />
-            <line x1="107.2" y1="38.5" x2="97.5" y2="43.2" />
-            <line x1="107.2" y1="81.5" x2="97.5" y2="76.8" />
-            <line x1="81.5" y1="107.2" x2="76.8" y2="97.5" />
-            <line x1="38.5" y1="107.2" x2="43.2" y2="97.5" />
-            <line x1="12.8" y1="81.5" x2="22.5" y2="76.8" />
-            <line x1="12.8" y1="38.5" x2="22.5" y2="43.2" />
+            <defs>
+              <radialGradient id="fallbackSunGradient" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" style={{ stopColor: '#f8f9fa', stopOpacity: 1 }} />
+                <stop offset="100%" style={{ stopColor: '#e9ecef', stopOpacity: 1 }} />
+              </radialGradient>
+            </defs>
             
-            {/* 細い放射線 */}
-            <line x1="30" y1="15" x2="33" y2="21" opacity="0.7" strokeWidth="1.5" />
-            <line x1="90" y1="15" x2="87" y2="21" opacity="0.7" strokeWidth="1.5" />
-            <line x1="105" y1="30" x2="99" y2="33" opacity="0.7" strokeWidth="1.5" />
-            <line x1="105" y1="90" x2="99" y2="87" opacity="0.7" strokeWidth="1.5" />
-            <line x1="90" y1="105" x2="87" y2="99" opacity="0.7" strokeWidth="1.5" />
-            <line x1="30" y1="105" x2="33" y2="99" opacity="0.7" strokeWidth="1.5" />
-            <line x1="15" y1="90" x2="21" y2="87" opacity="0.7" strokeWidth="1.5" />
-            <line x1="15" y1="30" x2="21" y2="33" opacity="0.7" strokeWidth="1.5" />
-          </g>
-          
-          {/* 中央の太陽ディスク */}
-          <circle 
-            cx="60" 
-            cy="60" 
-            r="28" 
-            fill="url(#sunGradient)"
-            stroke={variant === 'light' ? '#1e40af' : '#2563eb'}
-            strokeWidth="1.5"
-          />
-          
-          {/* 水面の波線 - 提供された画像に基づく */}
-          <g stroke="url(#waterGradient)" strokeWidth="2" fill="none">
-            <path d="M35 65 Q42 62 49 65 Q56 68 63 65 Q70 62 77 65 Q84 68 85 65" />
-            <path d="M37 72 Q44 69 51 72 Q58 75 65 72 Q72 69 79 72 Q83 74 83 72" />
-            <path d="M39 79 Q46 76 53 79 Q60 82 67 79 Q74 76 81 79" />
-          </g>
-          
-          {/* SOLVISテキスト（大きなサイズのみ） */}
-          {(size === 'lg' || size === 'xl') && (
+            {/* 太陽の放射線 */}
+            <g stroke="#d1d5db" strokeWidth="1.5" strokeLinecap="round" opacity="0.8">
+              {/* メインの24方向放射線 */}
+              <line x1="200" y1="40" x2="200" y2="80" />
+              <line x1="218" y1="42" x2="214" y2="82" />
+              <line x1="235" y1="48" x2="226" y2="86" />
+              <line x1="251" y1="57" x2="237" y2="92" />
+              <line x1="265" y1="68" x2="246" y2="99" />
+              <line x1="278" y1="81" x2="254" y2="107" />
+              <line x1="289" y1="95" x2="261" y2="116" />
+              <line x1="298" y1="111" x2="266" y2="125" />
+              <line x1="305" y1="127" x2="270" y2="135" />
+              <line x1="310" y1="144" x2="272" y2="145" />
+              <line x1="313" y1="162" x2="273" y2="155" />
+              <line x1="314" y1="180" x2="274" y2="165" />
+              <line x1="313" y1="198" x2="273" y2="175" />
+              <line x1="310" y1="216" x2="270" y2="185" />
+              <line x1="305" y1="233" x2="266" y2="195" />
+              <line x1="298" y1="249" x2="261" y2="204" />
+              <line x1="289" y1="265" x2="254" y2="213" />
+              <line x1="278" y1="279" x2="246" y2="221" />
+              <line x1="265" y1="292" x2="237" y2="228" />
+              <line x1="251" y1="303" x2="226" y2="234" />
+              <line x1="235" y1="312" x2="214" y2="238" />
+              <line x1="218" y1="318" x2="200" y2="280" />
+              <line x1="200" y1="320" x2="200" y2="280" />
+              <line x1="182" y1="318" x2="186" y2="278" />
+              <line x1="165" y1="312" x2="174" y2="274" />
+              <line x1="149" y1="303" x2="163" y2="268" />
+              <line x1="135" y1="292" x2="154" y2="261" />
+              <line x1="122" y1="279" x2="146" y2="253" />
+              <line x1="111" y1="265" x2="139" y2="244" />
+              <line x1="102" y1="249" x2="134" y2="235" />
+              <line x1="95" y1="233" x2="130" y2="225" />
+              <line x1="90" y1="216" x2="128" y2="215" />
+              <line x1="87" y1="198" x2="127" y2="205" />
+              <line x1="86" y1="180" x2="126" y2="195" />
+              <line x1="87" y1="162" x2="127" y2="185" />
+              <line x1="90" y1="144" x2="130" y2="175" />
+              <line x1="95" y1="127" x2="134" y2="165" />
+              <line x1="102" y1="111" x2="139" y2="156" />
+              <line x1="111" y1="95" x2="146" y2="147" />
+              <line x1="122" y1="81" x2="154" y2="139" />
+              <line x1="135" y1="68" x2="163" y2="132" />
+              <line x1="149" y1="57" x2="174" y2="126" />
+              <line x1="165" y1="48" x2="186" y2="122" />
+              <line x1="182" y1="42" x2="200" y2="120" />
+            </g>
+            
+            {/* 中央の太陽ディスク */}
+            <circle 
+              cx="200" 
+              cy="200" 
+              r="70" 
+              fill="url(#fallbackSunGradient)"
+              stroke="#e9ecef"
+              strokeWidth="2"
+            />
+            
+            {/* 水面の波線 */}
+            <g stroke="#93c5fd" strokeWidth="2" fill="none" opacity="0.7">
+              <path d="M120 280 Q140 275 160 280 Q180 285 200 280 Q220 275 240 280 Q260 285 280 280"/>
+              <path d="M130 295 Q150 290 170 295 Q190 300 210 295 Q230 290 250 295 Q270 300 270 295"/>
+              <path d="M140 310 Q160 305 180 310 Q200 315 220 310 Q240 305 260 310"/>
+              <path d="M150 325 Q170 320 190 325 Q210 330 230 325 Q250 320 250 325"/>
+            </g>
+            
+            {/* SOLVISテキスト */}
             <text 
-              x="60" 
-              y="60" 
+              x="200" 
+              y="210" 
               textAnchor="middle" 
               dominantBaseline="middle" 
-              fill="white"
-              fontSize="11"
+              fill="#6b7280"
+              fontSize="28"
               fontWeight="bold"
-              letterSpacing="1.5"
-              style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}
+              letterSpacing="3"
+              fontFamily="Arial, sans-serif"
             >
               SOLVIS
             </text>
-          )}
-          
-          {/* 小さなサイズ用のSマーク */}
-          {(size === 'sm' || size === 'md') && (
-            <text 
-              x="60" 
-              y="60" 
-              textAnchor="middle" 
-              dominantBaseline="middle" 
-              fill="white"
-              fontSize="18"
-              fontWeight="bold"
-              style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}
-            >
-              S
-            </text>
-          )}
-        </svg>
+          </svg>
+        </div>
       </div>
       
       {/* テキストロゴ */}
