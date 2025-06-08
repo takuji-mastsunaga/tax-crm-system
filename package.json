@@ -39,8 +39,8 @@
     "typescript": "^5"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
+    "node": "20.x",
+    "npm": ">=10.0.0"
   },
   "keywords": [
     "税理士",
@@ -55,6 +55,6 @@
   "author": "ソルビス税理士法人 (SOLVIS TAX ACCOUNTING)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR_USERNAME/solvis-tax-accounting-system.git"
+    "url": "https://github.com/takuji-mastsunaga/tax-crm-system.git"
   }
 }

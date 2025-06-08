@@ -2,7 +2,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "framework": "nextjs",
-  "installCommand": "npm install",
+  "installCommand": "npm ci",
   "devCommand": "npm run dev",
   "regions": ["hnd1"],
   "functions": {
@@ -10,9 +10,12 @@
       "maxDuration": 30
     }
   },
-  "env": {
-    "NEXTAUTH_URL": "https://tax-crm-system-v3.vercel.app",
-    "NEXT_PUBLIC_FIREBASE_PROJECT_ID": "tax-crm-project"
+  "build": {
+    "env": {
+      "NEXTAUTH_URL": "https://webapp-3skouonjn-tacks-projects-8e89a9f8.vercel.app",
+      "NEXT_PUBLIC_FIREBASE_PROJECT_ID": "tax-crm-project",
+      "NODE_OPTIONS": "--max-old-space-size=4096"
+    }
   },
   "headers": [
     {
@@ -31,6 +34,12 @@
           "value": "strict-origin-when-cross-origin"
         }
       ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/((?!api).*)",
+      "destination": "/"
     }
   ]
 } 
