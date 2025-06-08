@@ -36,10 +36,10 @@ export default function Logo({ size = 'md', variant = 'light', showText = true, 
   return (
     <div className={`flex items-center space-x-3 ${className}`}>
       <div className="relative flex items-center justify-center">
-        {/* 添付されたSOLVIS画像を正確に再現したSVG（透過背景） */}
+        {/* 実際に保存されたSOLVIS企業ロゴ画像を使用 */}
         <Image
-          src="/solvis-logo.svg"
-          alt="SOLVIS Tax Accounting Logo"
+          src="/solvis-logo.png"
+          alt="ソルビス税理士法人 - SOLVIS Tax Accounting Logo"
           width={sizeClasses[size].width}
           height={sizeClasses[size].height}
           className="object-contain"
