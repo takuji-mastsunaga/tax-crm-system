@@ -34,40 +34,75 @@ export default function Logo({ size = 'md', variant = 'light', showText = true, 
 
   return (
     <div className={`flex items-center space-x-3 ${className}`}>
-      {/* ロゴアイコン */}
-      <div className={`${sizeClasses[size]} bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl ring-1 ring-white/20`}>
+      {/* SOLVISロゴアイコン - 太陽の放射状デザイン */}
+      <div className={`${sizeClasses[size]} flex items-center justify-center`}>
         <svg 
-          viewBox="0 0 32 32" 
-          className="w-3/5 h-3/5 text-white" 
-          fill="currentColor"
+          viewBox="0 0 100 100" 
+          className="w-full h-full" 
+          fill="none"
         >
-          {/* 専門的な税理士アイコンデザイン */}
-          <g>
-            {/* メインドキュメント */}
-            <rect x="6" y="8" width="14" height="18" rx="2" fill="currentColor" opacity="0.9"/>
-            <rect x="20" y="10" width="8" height="14" rx="1" fill="currentColor" opacity="0.7"/>
+          {/* 太陽の放射線 */}
+          <g stroke={variant === 'light' ? '#60a5fa' : '#3b82f6'} strokeWidth="1.5" strokeLinecap="round">
+            {/* 上下左右の主要な放射線 */}
+            <line x1="50" y1="5" x2="50" y2="15" />
+            <line x1="50" y1="85" x2="50" y2="95" />
+            <line x1="5" y1="50" x2="15" y2="50" />
+            <line x1="85" y1="50" x2="95" y2="50" />
             
-            {/* 計算機のキーパッド */}
-            <circle cx="9" cy="12" r="1" fill="currentColor" opacity="0.8"/>
-            <circle cx="12" cy="12" r="1" fill="currentColor" opacity="0.8"/>
-            <circle cx="15" cy="12" r="1" fill="currentColor" opacity="0.8"/>
-            <circle cx="9" cy="15" r="1" fill="currentColor" opacity="0.8"/>
-            <circle cx="12" cy="15" r="1" fill="currentColor" opacity="0.8"/>
-            <circle cx="15" cy="15" r="1" fill="currentColor" opacity="0.8"/>
-            <circle cx="9" cy="18" r="1" fill="currentColor" opacity="0.8"/>
-            <circle cx="12" cy="18" r="1" fill="currentColor" opacity="0.8"/>
-            <circle cx="15" cy="18" r="1" fill="currentColor" opacity="0.8"/>
+            {/* 斜めの放射線 */}
+            <line x1="21.7" y1="21.7" x2="28.8" y2="28.8" />
+            <line x1="71.2" y1="71.2" x2="78.3" y2="78.3" />
+            <line x1="78.3" y1="21.7" x2="71.2" y2="28.8" />
+            <line x1="28.8" y1="71.2" x2="21.7" y2="78.3" />
             
-            {/* 'S' for SOLVIS - より洗練されたデザイン */}
-            <path 
-              d="M22 13 Q24 11.5 26 13 Q28 14.5 26 16 Q24 17.5 26 19 Q28 20.5 26 22" 
-              stroke="currentColor" 
-              strokeWidth="1.5" 
-              fill="none" 
-              opacity="0.9"
-              strokeLinecap="round"
-            />
+            {/* 中間の放射線 */}
+            <line x1="50" y1="10" x2="50" y2="18" />
+            <line x1="50" y1="82" x2="50" y2="90" />
+            <line x1="10" y1="50" x2="18" y2="50" />
+            <line x1="82" y1="50" x2="90" y2="50" />
+            
+            {/* より細かい放射線 */}
+            <line x1="25" y1="13.4" x2="27.3" y2="19.8" />
+            <line x1="75" y1="13.4" x2="72.7" y2="19.8" />
+            <line x1="25" y1="86.6" x2="27.3" y2="80.2" />
+            <line x1="75" y1="86.6" x2="72.7" y2="80.2" />
+            <line x1="13.4" y1="25" x2="19.8" y2="27.3" />
+            <line x1="13.4" y1="75" x2="19.8" y2="72.7" />
+            <line x1="86.6" y1="25" x2="80.2" y2="27.3" />
+            <line x1="86.6" y1="75" x2="80.2" y2="72.7" />
           </g>
+          
+          {/* 中央の太陽ディスク（水面も表現） */}
+          <circle 
+            cx="50" 
+            cy="50" 
+            r="20" 
+            fill={variant === 'light' ? '#60a5fa' : '#3b82f6'} 
+            opacity="0.9"
+          />
+          
+          {/* 水面の波線 */}
+          <g stroke={variant === 'light' ? '#93c5fd' : '#60a5fa'} strokeWidth="1" fill="none">
+            <path d="M30 55 Q35 52 40 55 Q45 58 50 55 Q55 52 60 55 Q65 58 70 55" opacity="0.8"/>
+            <path d="M32 60 Q37 57 42 60 Q47 63 52 60 Q57 57 62 60 Q67 63 68 60" opacity="0.6"/>
+            <path d="M34 65 Q39 62 44 65 Q49 68 54 65 Q59 62 64 65" opacity="0.4"/>
+          </g>
+          
+          {/* SOLVIS テキスト（小さなサイズでは省略） */}
+          {(size === 'lg' || size === 'xl') && (
+            <text 
+              x="50" 
+              y="50" 
+              textAnchor="middle" 
+              dominantBaseline="middle" 
+              fill={variant === 'light' ? 'white' : 'white'}
+              fontSize="8"
+              fontWeight="bold"
+              letterSpacing="1"
+            >
+              S
+            </text>
+          )}
         </svg>
       </div>
       
