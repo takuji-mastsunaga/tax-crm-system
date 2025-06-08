@@ -39,7 +39,11 @@ export default function SignIn() {
             <div className="flex justify-center mb-6">
               <Logo size="xl" variant="light" showText={false} />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2"><a href="https://www.solvis-tax.com/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-300 transition-colors duration-200">ソルビス税理士法人</a></h1>
+            <h1 className="text-2xl font-bold text-white mb-2">
+              <a href="https://www.solvis-tax.com/" target="_blank" rel="noopener noreferrer">
+                ソルビス税理士法人
+              </a>
+            </h1>
             <p className="text-gray-400 text-sm">
               SOLVIS TAX ACCOUNTING
             </p>
