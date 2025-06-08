@@ -1,64 +1,76 @@
-<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#60a5fa;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#93c5fd;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="waterGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#93c5fd;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#60a5fa;stop-opacity:0.6" />
     </linearGradient>
   </defs>
   
   <!-- 太陽の放射線 -->
-  <g stroke="#3b82f6" stroke-width="2" stroke-linecap="round">
-    <!-- 主要な放射線 -->
-    <line x1="50" y1="5" x2="50" y2="20" />
-    <line x1="50" y1="80" x2="50" y2="95" />
-    <line x1="5" y1="50" x2="20" y2="50" />
-    <line x1="80" y1="50" x2="95" y2="50" />
+  <g stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round">
+    <!-- メインの8方向放射線 -->
+    <line x1="60" y1="8" x2="60" y2="25" />
+    <line x1="60" y1="95" x2="60" y2="112" />
+    <line x1="8" y1="60" x2="25" y2="60" />
+    <line x1="95" y1="60" x2="112" y2="60" />
+    <line x1="21.2" y1="21.2" x2="32.7" y2="32.7" />
+    <line x1="87.3" y1="87.3" x2="98.8" y2="98.8" />
+    <line x1="98.8" y1="21.2" x2="87.3" y2="32.7" />
+    <line x1="32.7" y1="87.3" x2="21.2" y2="98.8" />
     
-    <!-- 斜めの放射線 -->
-    <line x1="21.7" y1="21.7" x2="32.3" y2="32.3" />
-    <line x1="67.7" y1="67.7" x2="78.3" y2="78.3" />
-    <line x1="78.3" y1="21.7" x2="67.7" y2="32.3" />
-    <line x1="32.3" y1="67.7" x2="21.7" y2="78.3" />
+    <!-- 中間の16方向放射線 -->
+    <line x1="38.5" y1="12.8" x2="43.2" y2="22.5" />
+    <line x1="81.5" y1="12.8" x2="76.8" y2="22.5" />
+    <line x1="107.2" y1="38.5" x2="97.5" y2="43.2" />
+    <line x1="107.2" y1="81.5" x2="97.5" y2="76.8" />
+    <line x1="81.5" y1="107.2" x2="76.8" y2="97.5" />
+    <line x1="38.5" y1="107.2" x2="43.2" y2="97.5" />
+    <line x1="12.8" y1="81.5" x2="22.5" y2="76.8" />
+    <line x1="12.8" y1="38.5" x2="22.5" y2="43.2" />
     
-    <!-- 中間の放射線 -->
-    <line x1="38.4" y1="11.6" x2="42.3" y2="21.8" />
-    <line x1="61.6" y1="11.6" x2="57.7" y2="21.8" />
-    <line x1="38.4" y1="88.4" x2="42.3" y2="78.2" />
-    <line x1="61.6" y1="88.4" x2="57.7" y2="78.2" />
-    <line x1="11.6" y1="38.4" x2="21.8" y2="42.3" />
-    <line x1="11.6" y1="61.6" x2="21.8" y2="57.7" />
-    <line x1="88.4" y1="38.4" x2="78.2" y2="42.3" />
-    <line x1="88.4" y1="61.6" x2="78.2" y2="57.7" />
+    <!-- 細い放射線 -->
+    <line x1="30" y1="15" x2="33" y2="21" opacity="0.7" stroke-width="1.5" />
+    <line x1="90" y1="15" x2="87" y2="21" opacity="0.7" stroke-width="1.5" />
+    <line x1="105" y1="30" x2="99" y2="33" opacity="0.7" stroke-width="1.5" />
+    <line x1="105" y1="90" x2="99" y2="87" opacity="0.7" stroke-width="1.5" />
+    <line x1="90" y1="105" x2="87" y2="99" opacity="0.7" stroke-width="1.5" />
+    <line x1="30" y1="105" x2="33" y2="99" opacity="0.7" stroke-width="1.5" />
+    <line x1="15" y1="90" x2="21" y2="87" opacity="0.7" stroke-width="1.5" />
+    <line x1="15" y1="30" x2="21" y2="33" opacity="0.7" stroke-width="1.5" />
   </g>
   
   <!-- 中央の太陽ディスク -->
   <circle 
-    cx="50" 
-    cy="50" 
-    r="22" 
-    fill="url(#logoGradient)" 
-    stroke="#1e40af" 
-    stroke-width="1"
+    cx="60" 
+    cy="60" 
+    r="28" 
+    fill="url(#logoGradient)"
+    stroke="#1e40af"
+    stroke-width="1.5"
   />
   
   <!-- 水面の波線 -->
-  <g stroke="#93c5fd" stroke-width="1.5" fill="none" opacity="0.8">
-    <path d="M32 55 Q37 52 42 55 Q47 58 52 55 Q57 52 62 55 Q67 58 68 55"/>
-    <path d="M34 60 Q39 57 44 60 Q49 63 54 60 Q59 57 64 60 Q66 62 66 60"/>
-    <path d="M36 65 Q41 62 46 65 Q51 68 56 65 Q61 62 64 65"/>
+  <g stroke="url(#waterGradient)" stroke-width="2" fill="none">
+    <path d="M35 65 Q42 62 49 65 Q56 68 63 65 Q70 62 77 65 Q84 68 85 65"/>
+    <path d="M37 72 Q44 69 51 72 Q58 75 65 72 Q72 69 79 72 Q83 74 83 72"/>
+    <path d="M39 79 Q46 76 53 79 Q60 82 67 79 Q74 76 81 79"/>
   </g>
   
   <!-- SOLVIS テキスト -->
   <text 
-    x="50" 
-    y="50" 
+    x="60" 
+    y="60" 
     text-anchor="middle" 
     dominant-baseline="middle" 
     fill="white"
-    font-size="12"
+    font-size="11"
     font-weight="bold"
-    letter-spacing="2"
+    letter-spacing="1.5"
   >
     SOLVIS
   </text>
