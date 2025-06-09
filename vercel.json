@@ -17,6 +17,9 @@
       "NODE_OPTIONS": "--max-old-space-size=4096"
     }
   },
+  "engines": {
+    "node": "20.x"
+  },
   "headers": [
     {
       "source": "/(.*)",

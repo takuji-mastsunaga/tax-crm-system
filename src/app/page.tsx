@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { 
@@ -12,8 +12,7 @@ import {
   BellIcon,
   Cog6ToothIcon,
   QuestionMarkCircleIcon,
-  Bars3Icon,
-  XMarkIcon
+  Bars3Icon
 } from '@heroicons/react/24/outline'
 import WorkLogForm from '@/components/WorkLogForm'
 import MessageMemoCarousel from '@/components/MessageMemoCarousel'
@@ -66,14 +65,7 @@ export default function Home() {
   }, [])
 
   // 従業員情報の取得
-  useEffect(() => {
-    if (session?.user?.email) {
-      fetchEmployeeData(session.user.email)
-      fetchAttendanceStatus(session.user.email)
-    }
-  }, [session])
-
-  const fetchEmployeeData = async (email: string) => {
+  const fetchEmployeeData = useCallback(async (email: string) => {
     try {
       const response = await fetch(`/api/employees?email=${email}`)
       if (response.ok) {
@@ -102,7 +94,15 @@ export default function Home() {
         position: 'スタッフ'
       })
     }
-  }
+  }, [session?.user?.name])
+
+  // 従業員情報の取得
+  useEffect(() => {
+    if (session?.user?.email) {
+      fetchEmployeeData(session.user.email)
+      fetchAttendanceStatus(session.user.email)
+    }
+  }, [session, fetchEmployeeData])
 
   const fetchAttendanceStatus = async (email: string) => {
     try {

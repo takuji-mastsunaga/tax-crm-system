@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { 
   CalendarIcon,
@@ -54,14 +54,7 @@ export default function EmployeeDashboard() {
   }, [])
 
   // 従業員情報の取得
-  useEffect(() => {
-    if (session?.user?.email) {
-      fetchEmployeeData(session.user.email)
-      fetchAttendanceStatus(session.user.email)
-    }
-  }, [session])
-
-  const fetchEmployeeData = async (email: string) => {
+  const fetchEmployeeData = useCallback(async (email: string) => {
     try {
       const response = await fetch(`/api/employees?email=${email}`)
       if (response.ok) {
@@ -90,7 +83,15 @@ export default function EmployeeDashboard() {
         position: 'デモ職位'
       })
     }
-  }
+  }, [session?.user?.name])
+
+  // 従業員情報の取得
+  useEffect(() => {
+    if (session?.user?.email) {
+      fetchEmployeeData(session.user.email)
+      fetchAttendanceStatus(session.user.email)
+    }
+  }, [session, fetchEmployeeData])
 
   const fetchAttendanceStatus = async (email: string) => {
     try {
