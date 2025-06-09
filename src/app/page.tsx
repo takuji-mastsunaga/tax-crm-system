@@ -213,17 +213,22 @@ export default function Home() {
     <div className="flex h-screen bg-gray-50">
       {/* サイドバー */}
       <div 
-        className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-[#1A237E] text-white transition-all duration-300 flex flex-col hover:w-64 group`}
-        onMouseEnter={() => setSidebarOpen(true)}
-        onMouseLeave={() => setSidebarOpen(false)}
+        className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-[#1A237E] text-white transition-all duration-300 flex flex-col`}
       >
         <div className="p-4 border-b border-indigo-700">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <Bars3Icon className="h-6 w-6 text-white" />
-              <h1 className={`text-lg font-bold ml-3 transition-opacity duration-300 ${sidebarOpen || 'group-hover:opacity-100' ? 'opacity-100' : 'opacity-0'}`}>
-                ソルビス税理士法人
-              </h1>
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="text-white hover:text-gray-300"
+              >
+                <Bars3Icon className="h-6 w-6" />
+              </button>
+              {sidebarOpen && (
+                <h1 className="text-lg font-bold ml-3 transition-opacity duration-300">
+                  ソルビス税理士法人
+                </h1>
+              )}
             </div>
           </div>
         </div>
@@ -245,10 +250,12 @@ export default function Home() {
                   }`}
                   title={item.label}
                 >
-                  <item.icon className="h-6 w-6 mr-3 flex-shrink-0" />
-                  <span className={`transition-opacity duration-300 ${sidebarOpen || 'group-hover:opacity-100' ? 'opacity-100' : 'opacity-0'}`}>
-                    {item.label}
-                  </span>
+                  <item.icon className="h-6 w-6 flex-shrink-0" />
+                  {sidebarOpen && (
+                    <span className="ml-3 transition-opacity duration-300">
+                      {item.label}
+                    </span>
+                  )}
                 </button>
               </li>
             ))}
@@ -262,12 +269,14 @@ export default function Home() {
             className="w-full flex items-center p-3 rounded-lg hover:bg-red-600 transition-colors text-left"
             title="ログアウト"
           >
-            <svg className="h-6 w-6 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-6 w-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            <span className={`transition-opacity duration-300 ${sidebarOpen || 'group-hover:opacity-100' ? 'opacity-100' : 'opacity-0'}`}>
-              ログアウト
-            </span>
+            {sidebarOpen && (
+              <span className="ml-3 transition-opacity duration-300">
+                ログアウト
+              </span>
+            )}
           </button>
         </div>
       </div>

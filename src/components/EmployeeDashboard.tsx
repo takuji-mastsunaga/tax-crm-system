@@ -220,8 +220,8 @@ export default function EmployeeDashboard() {
                     activeSection === item.id ? 'bg-indigo-700' : ''
                   }`}
                 >
-                  <item.icon className="h-6 w-6 mr-3" />
-                  {sidebarOpen && <span>{item.label}</span>}
+                  <item.icon className="h-6 w-6 flex-shrink-0" />
+                  {sidebarOpen && <span className="ml-3">{item.label}</span>}
                 </button>
               </li>
             ))}
