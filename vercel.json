@@ -13,6 +13,9 @@
   "build": {
     "env": {
       "NEXTAUTH_URL": "https://webapp-3skouonjn-tacks-projects-8e89a9f8.vercel.app",
+      "NEXTAUTH_SECRET": "qb6mlfLlXq7nuXPcgdLDmzssWLBXwyX5CdpmwtjOx3k=",
+      "GOOGLE_CLIENT_ID": "placeholder-google-client-id",
+      "GOOGLE_CLIENT_SECRET": "placeholder-google-client-secret",
       "NEXT_PUBLIC_FIREBASE_PROJECT_ID": "tax-crm-project",
       "NODE_OPTIONS": "--max-old-space-size=4096"
     }
